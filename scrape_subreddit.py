@@ -1,17 +1,31 @@
 from requests_html import HTMLSession
+import re
 
-url = "https://old.reddit.com/r/Python/"
 
-session = HTMLSession()
+def get_post_containers(url: str) -> list:
 
-r = session.get(url)
+    assert bool(re.match("https://(www.)?(old\.)?reddit.com/r/\w+", url))
 
-post_containers = r.html.find(".thing.link")
+    try:
+        session = HTMLSession()
+        r = session.get(url)
 
-cleaned_post_containers = [
-    post_container
-    for post_container in post_containers
-    if "promoted" not in post_container.attrs["class"]
-]
+        r.raise_for_status()
 
-print(len(cleaned_post_containers))
+        post_containers = r.html.find(".thing.link")
+
+        cleaned_post_containers = [
+            post_container
+            for post_container in post_containers
+            if "promoted" not in post_container.attrs["class"]
+        ]
+
+        return cleaned_post_containers
+
+    except Exception as e:
+        print("There was a problem occured: ", e)
+
+
+if __name__ == "__main__":
+    url = "https://old.reddit.com/r/PY2423534T/"
+    get_post_containers(url)
