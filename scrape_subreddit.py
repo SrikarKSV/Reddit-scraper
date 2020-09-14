@@ -33,6 +33,10 @@ def get_post_containers(url: str) -> list:
         post_containers = r.html.find(".thing.link")
         next_page_link = r.html.find("span.next-button a", first=True)
 
+        if not bool(post_containers):
+            print("Seems like the category or subreddit provided doesn't have any posts.")
+            sys.exit()
+
         cleaned_post_containers = [
             post_container
             for post_container in post_containers
@@ -113,5 +117,5 @@ def convert_new_links_to_old(url: str) -> str:
 
 
 if __name__ == "__main__":
-    url = "https://www.reddit.com/r/DearPyGui/"
+    url = "https://old.reddit.com/r/DearPyGui/top/"
     paginate(url, no_of_posts=100)
