@@ -2,6 +2,7 @@ from requests_html import HTMLSession
 import re
 import csv
 import time
+import sys
 
 
 def get_post_containers(url: str) -> list:
@@ -58,16 +59,16 @@ def paginate(url: str, no_of_pages: int = None, no_of_posts: int = None) -> None
 
 
 def scrape_based_on_pages(url: str, no_of_pages: int, csv_writer: csv.DictWriter):
-    for page in range(1, no_of_pages):
+    for page in range(1, no_of_pages + 1):
         posts_data, url = get_post_containers(url)
         csv_writer.writerows(posts_data)
         print("Completed Page: ", page)
 
-        if url:
-            url = url.attrs.get("href")
-        else:
-            print("We came to the end of the subreddit and have scraped everything!")
+        url, loop = get_next_page_link(url)
+
+        if not loop:
             break
+
         time.sleep(3)
 
 
@@ -79,19 +80,24 @@ def scrape_based_on_posts(url: str, no_of_posts: int, csv_writer: csv.DictWriter
         for post_data in posts_data:
             if no_of_posts_saved >= no_of_posts:
                 print(f"{no_of_posts} have been scraped and saved!")
-                loop = False
-                break
+                sys.exit()
 
             csv_writer.writerow(post_data)
             no_of_posts_saved += 1
 
-        if url:
-            url = url.attrs.get("href")
-        else:
-            print("We came to the end of the subreddit and have scraped everything!")
-            break
+        url, loop = get_next_page_link(url, loop)
 
         time.sleep(3)
+
+
+def get_next_page_link(url: str, loop: bool = True):
+    if url:
+        url = url.attrs.get("href")
+    else:
+        print("We came to the end of the subreddit and have scraped everything!")
+        loop = False
+
+    return url, loop
 
 
 def convert_new_links_to_old(url: str) -> str:
@@ -105,4 +111,4 @@ def convert_new_links_to_old(url: str) -> str:
 
 if __name__ == "__main__":
     url = "https://www.reddit.com/r/DearPyGui/"
-    paginate(url, no_of_posts=5)
+    paginate(url, no_of_pages=5)
