@@ -5,11 +5,22 @@ import time
 import sys
 
 
+def paginate(url: str, no_of_pages: int = None, no_of_posts: int = None) -> None:
+    with open("reddit_data.csv", "a", encoding="utf-8", newline="\n") as f:
+        fieldnames = ["title", "author", "post_link", "votes", "post_date"]
+        csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
+        csv_writer.writeheader()
+
+        if no_of_pages:
+            scrape_based_on_pages(url, no_of_pages, csv_writer)
+        else:
+            scrape_based_on_posts(url, no_of_posts, csv_writer)
+
+
 def get_post_containers(url: str) -> list:
 
-    assert bool(
-        re.match("https://(www.)?(old\.)?reddit.com/r/\w+", url)
-    ), "The URL provided is not a valid subreddit URL"
+    assert bool(re.match("https://(www.)?(old\.)?reddit.com/r/\w+",
+                         url)), "The URL provided is not a valid subreddit URL"
 
     url = convert_new_links_to_old(url)
 
@@ -46,18 +57,6 @@ def get_post_containers(url: str) -> list:
         print("There was a problem occurred: ", e)
 
 
-def paginate(url: str, no_of_pages: int = None, no_of_posts: int = None) -> None:
-    with open("reddit_data.csv", "a", encoding="utf-8", newline="\n") as f:
-        fieldnames = ["title", "author", "post_link", "votes", "post_date"]
-        csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
-        csv_writer.writeheader()
-
-        if no_of_pages:
-            scrape_based_on_pages(url, no_of_pages, csv_writer)
-        else:
-            scrape_based_on_posts(url, no_of_posts, csv_writer)
-
-
 def scrape_based_on_pages(url: str, no_of_pages: int, csv_writer: csv.DictWriter):
     for page in range(1, no_of_pages + 1):
         posts_data, url = get_post_containers(url)
@@ -75,6 +74,7 @@ def scrape_based_on_pages(url: str, no_of_pages: int, csv_writer: csv.DictWriter
 def scrape_based_on_posts(url: str, no_of_posts: int, csv_writer: csv.DictWriter):
     no_of_posts_saved = 0
     loop = True
+    page_no = 0
     while loop:
         posts_data, url = get_post_containers(url)
         for post_data in posts_data:
@@ -84,6 +84,9 @@ def scrape_based_on_posts(url: str, no_of_posts: int, csv_writer: csv.DictWriter
 
             csv_writer.writerow(post_data)
             no_of_posts_saved += 1
+        page_no += 1
+        print(
+            f"Completed page: {page_no} and saved total of {no_of_posts_saved} posts.")
 
         url, loop = get_next_page_link(url, loop)
 
@@ -111,4 +114,4 @@ def convert_new_links_to_old(url: str) -> str:
 
 if __name__ == "__main__":
     url = "https://www.reddit.com/r/DearPyGui/"
-    paginate(url, no_of_pages=5)
+    paginate(url, no_of_posts=100)
