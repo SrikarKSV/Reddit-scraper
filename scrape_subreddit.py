@@ -10,7 +10,7 @@ def get_post_containers(url: str) -> list:
         re.match("https://(www.)?(old\.)?reddit.com/r/\w+", url)
     ), "The URL provided is not a valid subreddit URL"
 
-    convert_new_links_to_old(url)
+    url = convert_new_links_to_old(url)
 
     try:
         session = HTMLSession()
@@ -75,5 +75,5 @@ def convert_new_links_to_old(url: str) -> str:
 
 
 if __name__ == "__main__":
-    url = "https://www.reddit.com/r/DearPyGui/"
+    url = "https://reddit.com/r/DearPyGui/"
     paginate(10, url)
