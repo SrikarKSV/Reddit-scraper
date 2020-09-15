@@ -3,20 +3,25 @@ from scrape.scrape_subreddit import paginate
 import click
 
 
-@click.command()
-@click.argument("url", type=str, required=True)
-@click.option("-npg", "--no-of-pages", type=int, default=None, help="Enter number of pages to scrape.")
-@click.option("-npo", "--no-of-posts", type=int, default=None, help="Enter number of posts to scrape.")
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("url", type=str, required=True, metavar="<URL>")
+@click.option("-npg", "--no-of-pages", metavar="<int>", type=int, default=None, help="Enter number of pages to scrape.")
+@click.option("-npo", "--no-of-posts", metavar="<int>", type=int, default=None, help="Enter number of posts to scrape.")
 @click.option("-c",
               type=click.Choice(['n', 'r', "ch", "c24", "cw", "cm",
                                  "cy", "ca", "th", "t24", "tw", "tm", "ty", "ta"], case_sensitive=False),
               help="Choose any category: [n: new, r: rising, ch: Controversial posts from last hour, c24: Controversial posts from 24 hours, cw: Controversial posts from last week, cy: Controversial posts from last year, ca: Controversial posts all time, th: Top posts from last hour, t24: Top posts from last 24 hours, tw: Top posts from last week, tm: Top posts from last month, ty: Top posts from last year, ta: Top posts all time]",
               default="nope")
-@click.option("-o", "--output-file", type=str, default="reddit", help="Name output file(Default is 'reddit.csv')")
+@click.option("-o", "--output-file", metavar="<str>", type=str, default="reddit", help="Name output file without extension(Default is 'reddit.csv')")
 def main(url, no_of_pages, no_of_posts, c, output_file):
     """Enter base URL of the subreddit.
 
-    Ex: main.py -npg | -npo=<number of posts/pages> -c=<category> <URL> -o <output-file>
+    Ex: main.py -npg | -npo=<number of posts/pages> -c <category> <URL> -o=<output-file>
+
+    The scraped data will be saved into a csv file.
     """
     url = convert_categories(url, c)
     if no_of_pages:
