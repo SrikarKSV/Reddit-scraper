@@ -4,6 +4,7 @@ import sys
 def convert_categories(url: str, category: str) -> str:
     url = url.rstrip('/')
     categories = {
+        "nope": "/",
         "n": "/new/",
         "r": "/rising/",
         "ch": "/controversial/?sort=controversial&t=hour",
