@@ -5,8 +5,8 @@ import time
 import sys
 
 
-def paginate(url: str, no_of_pages: int = None, no_of_posts: int = None) -> None:
-    with open("reddit_data.csv", "a", encoding="utf-8", newline="\n") as f:
+def paginate(url: str, output_file: str, no_of_pages: int = None, no_of_posts: int = None) -> None:
+    with open(f"{output_file}.csv", "a", encoding="utf-8", newline="\n") as f:
         fieldnames = ["title", "author", "post_link", "votes", "post_date"]
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
         csv_writer.writeheader()
